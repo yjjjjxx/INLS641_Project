@@ -1,4 +1,4 @@
-### 1983 to 2017 Video Game Sales Interactive Visualizations
+## 1983 to 2017 Video Game Sales Interactive Visualizations
 
 #### **Our goal**
 
@@ -35,7 +35,7 @@ Additionally, we intend to add icon buttons on the homepage which show the logo 
 
 ![](https://cdn-images-1.medium.com/max/800/1*nGvDm-spMncQrfPuO8AAdw.png)
 
-                         Figure 1: UI Sketches
+Figure 1: UI Sketches
 
 #### Data clean and manipulation
 
