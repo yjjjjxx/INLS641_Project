@@ -60,7 +60,7 @@ Our final prototype meets the most requirements of our first design, which inclu
 
 The first visualization is the bar chart race. This chart is an animation about the relationship between global sales and game publishers. A high-volume publisher will appear at the top with a longer bar, and the poor one will appear at the bottom with a shorter bar. As time advances, the ranking changes between game publishers and their bar length.
 
-![Bar Chart Race](https://cdn-images-1.medium.com/max/800/1*pOIalStDd7lrt3uYpYuj7w.gif)
+![Bar Chart Race](https://github.com/yjjjjxx/Video-Game-Sales-Interactive-Visualizations/blob/160ec641d1c1e5d3ddea31e21fe7514ab9f448a1/bar%20chart%20race.gif)
 
 Figure 2: Bar Chart Race
 
@@ -95,7 +95,3 @@ Overall our project is progressing very nicely. We had a good division of labor 
 In general, our project does not violate any ethical guidelines. Our data comes from Kaggle which is a free platform for users to access public data sets. However, it is worth noting that this data has significant missing values from 2017 onwards and this has led us to discard this part of the data. Similarly, we found that the peak of game sales was around 2010 and the data showed a sharp decline after that. We can see that this does not correspond to the real market trends. We suspect that due to the prevalence of digital versions of video games, this has led to some barriers to data collection. More and more game platforms and publishers will consider the privacy of the data and will not disclose the real data. In addition to this, again due to the privacy of the data. We did not find a suitable API to display game description and pictures. It is also possible to spend money to buy data illegally obtained by others, but this is not a good manner, and we have to respect the request of websites that do not want data leakage.
 
 By [Yjjjjxx](https://medium.com/@yjjjjxx) on [May 1, 2022](https://medium.com/p/c49b48dfdfdf).
-
-[Canonical link](https://medium.com/@yjjjjxx/finls641-final-project-1983-to-2017-video-game-sales-interactive-visualizations-c49b48dfdfdf)
-
-Exported from [Medium](https://medium.com) on May 2, 2022.
