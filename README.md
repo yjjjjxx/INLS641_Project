@@ -1,4 +1,4 @@
-## 1983 to 2017 Video Game Sales Interactive Visualizations
+# 1983 to 2017 Video Game Sales Interactive Visualizations
 
 #### **Our goal**
 
