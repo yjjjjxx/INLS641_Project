@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>INLS 641 Project</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <style>
+        body{
+            padding-left: 50px;
+            color:#45443B;
+            background-color: floralwhite}
+    </style>
+
+</head>
+<style>		 
+    .tableauViz{
+        width: 100%;
+        height: 100%;
+    }
+
+    .platformButton{
+		background-color:rgba(0, 0, 0, 0);}
+	}
+	
+	.platformImg {
+		max-width: 100%;
+		height: auto;
+		display: inline-block;
+	}
+	
+	.button {
+        border: none;
+        cursor: pointer;
+		background-color:rgba(0, 0, 0, 0);
+    }
+	
+	.button:hover,.button:active {
+		transform: scale(1.1);
+		background-color:rgba(0, 0, 0, 0);
+	}
+													
+	.image {
+		max-width: 100%;
+		height: auto;
+		display: inline-block;
+	}
+													
+	text.subTitle{
+		font-weight: 500;
+		fill: #777777;
+	}
+	text.caption{
+		font-weight: 400;
+		font-size: 14px;
+		fill: #777777;
+	}
+	text.label{
+		font-weight: 600;
+	}
+
+	text.valueLabel{
+		font-weight: 300;
+	}
+
+	text.yearText{
+		font-size: 64px;
+		font-weight: 700;
+		opacity: 0.25;
+	}
+	.tick text {
+		fill: #777777;
+	}
+	.xAxis .tick:nth-child(2) text {
+		text-anchor: start;
+	}
+	.tick line {
+		shape-rendering: CrispEdges;
+		stroke: #dddddd;
+	}
+	.tick line.origin{
+		stroke: #aaaaaa;
+	}
+	path.domain{
+		display: none;
+	}
+</style>
+
+<script src="https://d3js.org/d3.v6.js"></script>
+//Based on help from : https://bl.ocks.org/jrzief/70f1f8a5d066a286da3a1e699823470f
+
+<body>
+    <div>
+        <h2 style="font-family:Comic Sans MS;">1983-2017 Video Game Sales Interactive Visualizations</h2>
+
+        <div class="row">
+			<div class="col-md-6" id="bar-char-race">
+				<script>
+					var svg = d3.select("#bar-char-race").append("svg")
+					  .attr("width", 1700)
+					  .attr("height", 600);
+					
+					var tickDuration = 1000;
+					
+					var top_n = 5;
+					var height = 600;
+					var width = 1400;
+					
+					const margin = {
+					  top: 80,
+					  right: 0,
+					  bottom: 5,
+					  left: 0
+					};
+				  
+					let barPadding = (height-(margin.bottom+margin.top))/(top_n*5);
+					  
+					let title = svg.append('text')
+					 .attr('class', 'title')
+					 .attr('y', 24)
+					 .html('1985-2016 Global Sales by Publisher');
+				  
+					let subTitle = svg.append("text")
+					 .attr("class", "subTitle")
+					 .attr("y", 55)
+					 .html("Total Sales, $m");
+				   
+					let caption = svg.append('text')
+					 .attr('class', 'caption')
+					 .attr('x', width)
+					 .attr('y', height-5)
+					 .style('text-anchor', 'end')
+					 .html('Source: Publisher');
+
+					 let year = 1985;
+					
+				  d3.csv('https://raw.githubusercontent.com/Evehe719/INLS641/main/try2top5.csv').then(function(data) {
+					//if (error) throw error;
+					  
+					  console.log(data);
+					  
+					   data.forEach(d => {
+						d.total_sales = +d.total_sales,
+						d.Year = +d.Year,
+						d.colour = d3.hsl(Math.random()*360,0.75,0.75)
+					  });
+
+					 console.log(data);
+					
+					 let yearSlice = data.filter(d => d.Year == year)
+					  .sort((a,b) => b.total_sales - a.total_sales)
+					  .slice(0, top_n);
+				  
+					  yearSlice.forEach((d,i) => d.rank = i);
+					
+					 console.log('yearSlice: ', yearSlice)
+				  
+					 let x = d3.scaleLinear()
+						.domain([0, d3.max(yearSlice, d => d.total_sales)])
+						.range([margin.left, width-margin.right-65]);
+				  
+					 let y = d3.scaleLinear()
+						.domain([top_n, 0])
+						.range([height-margin.bottom, margin.top]);
+				  
+					 let xAxis = d3.axisTop()
+						.scale(x)
+						.ticks(width > 500 ? 5:2)
+						.tickSize(-(height-margin.top-margin.bottom))
+						.tickFormat(d => d3.format(',')(d));
+				  
+					 svg.append('g')
+					   .attr('class', 'axis xAxis')
+					   .attr('transform', `translate(0, ${margin.top})`)
+					   .call(xAxis)
+					   .selectAll('.tick line')
+					   .classed('origin', d => d == 0);
+				  
+					 svg.selectAll('rect.bar')
+						.data(yearSlice, d => d.Publisher)
+						.enter()
+						.append('rect')
+						.attr('class', 'bar')
+						.attr('x', x(0)+1)
+						.attr('width', d => x(d.total_sales)-x(0)-1)
+						.attr('y', d => y(d.rank)+5)
+						.attr('height', y(1)-y(0)-barPadding)
+						.style('fill', d => d.colour);
+					  
+					 svg.selectAll('text.label')
+						.data(yearSlice, d => d.Publisher)
+						.enter()
+						.append('text')
+						.attr('class', 'label')
+						.attr('x', d => x(d.total_sales) + 5)
+						.attr('y', d => y(d.rank)+5+((y(1)-y(0))/2)+1)
+						.style('text-anchor', 'start')
+						.html(d => d.Publisher);
+					  
+					svg.selectAll('text.valueLabel')
+					  .data(yearSlice, d => d.Publisher)
+					  .enter()
+					  .append('text')
+					  .attr('class', 'valueLabel')
+					  .attr('x', d => x(d.total_sales)+5)
+					  .attr('y', d => y(d.rank)+5+((y(1)-y(0))/2)+1);
+
+					let yearText = svg.append('text')
+					  .attr('class', 'yearText')
+					  .attr('x', width-margin.right)
+					  .attr('y', height-25)
+					  .style('text-anchor', 'end')
+					  .html(~~year)
+					  .call(halo, 10);
+					 
+				   let ticker = d3.interval(e => {
+
+					  yearSlice = data.filter(d => d.Year == year)
+						.sort((a,b) => b.total_sales - a.total_sales)
+						.slice(0,top_n);
+
+					  yearSlice.forEach((d,i) => d.rank = i);
+					 
+					  //console.log('IntervalYear: ', yearSlice);
+
+					  x.domain([0, d3.max(yearSlice, d => d.total_sales)]); 
+					 
+					  svg.select('.xAxis')
+						.transition()
+						.duration(tickDuration)
+						.ease(d3.easeLinear)
+						.call(xAxis);
+					
+					   let bars = svg.selectAll('.bar').data(yearSlice, d => d.Publisher);
+					
+					   bars
+						.enter()
+						.append('rect')
+						.attr('class', d => `bar ${d.Publisher.replace(/\s/g,'_')}`)
+						.attr('x', x(0)+1)
+						.attr( 'width', d => x(d.total_sales)-x(0)-1)
+						.attr('y', d => y(top_n+1)+5)
+						.attr('height', y(1)-y(0)-barPadding)
+						.style('fill', d => d.colour)
+						.transition()
+						  .duration(tickDuration)
+						  .ease(d3.easeLinear)
+						  .attr('y', d => y(d.rank)+5);
+						  
+					   bars
+						.transition()
+						  .duration(tickDuration)
+						  .ease(d3.easeLinear)
+						  .attr('width', d => x(d.total_sales)-x(0)-1)
+						  .attr('y', d => y(d.rank)+5);
+							
+					   bars
+						.exit()
+						.transition()
+						  .duration(tickDuration)
+						  .ease(d3.easeLinear)
+						  .attr('width', d => x(d.total_sales)-x(0)-1)
+						  .attr('y', d => y(top_n+1)+5)
+						  .remove();
+
+					   let labels = svg.selectAll('.label')
+						  .data(yearSlice, d => d.Publisher);
+					 
+					   labels
+						.enter()
+						.append('text')
+						.attr('class', 'label')
+						.attr('x', d => x(d.total_sales) + 5)
+						.attr('y', d => y(top_n+1)+5+((y(1)-y(0))/2))
+						.style('text-anchor', 'start')
+						.html(d => d.Publisher)    
+						.transition()
+						  .duration(tickDuration)
+						  .ease(d3.easeLinear)
+						  .attr('y', d => y(d.rank)+5+((y(1)-y(0))/2)+1);
+							 
+					
+					   labels
+						  .transition()
+						  .duration(tickDuration)
+							.ease(d3.easeLinear)
+							.attr('x', d => x(d.total_sales) + 5)
+							.attr('y', d => y(d.rank)+5+((y(1)-y(0))/2)+1);
+					 
+					   labels
+						  .exit()
+						  .transition()
+							.duration(tickDuration)
+							.ease(d3.easeLinear)
+							.attr('x', d => x(d.total_sales)-8)
+							.attr('y', d => y(top_n+1)+5)
+							.remove();
+						 
+					   let valueLabels = svg.selectAll('.valueLabel').data(yearSlice, d => d.Publisher);
+					
+					   valueLabels
+						  .enter()
+						  .append('text')
+						  .attr('class', 'valueLabel')
+						  .attr('x', d => x(d.total_sales)+5)
+						  .attr('y', d => y(top_n+1)+5)
+						  .transition()
+							.duration(tickDuration)
+							.ease(d3.easeLinear)
+							.attr('y', d => y(d.rank)+5+((y(1)-y(0))/2)+1);
+							
+					  valueLabels
+						.exit()
+						.transition()
+						  .duration(tickDuration)
+						  .ease(d3.easeLinear)
+						  .attr('x', d => x(d.total_sales)+5)
+						  .attr('y', d => y(top_n+1)+5)
+						  .remove();
+					
+					  yearText.html(~~year);
+					 
+					 if(year == 2016) ticker.stop();
+					 year = d3.format('.1f')((+year) + 1);
+				   },tickDuration);
+				 });
+					
+				 const halo = function(text, strokeWidth) {
+				  text.select(function() { return this.parentNode.insertBefore(this.cloneNode(true), this); })
+					.style('fill', '#ffffff')
+					 .style( 'stroke','#ffffff')
+					 .style('stroke-width', strokeWidth)
+					 .style('stroke-linejoin', 'round')
+					 .style('opacity', 1);
+				   
+				 }   
+			  </script>
+			</div>
+		</div>
+		
+		<div class="row" style="margin-top: 50px">
+            <div class="col-md-6">
+                    <h4 style="font-family:Comic Sans MS;">Sales by Year</h4>
+                    <select id="selectButton"></select>
+                    <div id="my_dataviz"></div>
+                    <script>
+                        function render_sales_by_year() {
+                            // set the dimensions and margins of the graph
+                            const margin = {top: 10, right: 300, bottom: 100, left: 30},
+                                width = 700 - margin.left - margin.right,
+                                height = 300 - margin.top - margin.bottom;
+
+                            // append the svg object to the body of the page
+                            const svg = d3.select("#my_dataviz")
+                                .append("svg")
+                                // .attr("width", width + margin.left + margin.right)
+                                // .attr("height", height + margin.top + margin.bottom)
+                                .attr("preserveAspectRatio", "xMinYMin meet")
+                                .attr("viewBox", `0 0 350 350`)
+                                .append("g")
+                                .attr("transform", `translate(0,${margin.top})`);
+
+                            //Read the data
+                            d3.csv("https://raw.githubusercontent.com/yjjjjxx/INLS641_Project/main/test.csv").then( function(data) {
+                                // console.log(data)
+                                data.sort(
+                                    function(a, b) { return (a.Year > b.Year) ? 1 : -1 }
+                                )
+
+                                // List of groups (here I have one group per column)
+                                const allGroup = ["Global_Sales", "EU_Sales", "JP_Sales", "Other_Sales", "NA_Sales"]
+
+                                // add the options to the button
+                                d3.select("#selectButton")
+                                    .selectAll('myOptions')
+                                    .data(allGroup)
+                                    .enter()
+                                    .append('option')
+                                    .text(function (d) { return d; }) // text showed in the menu
+                                    .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+                                // A color scale: one color for each group
+                                const myColor = d3.scaleOrdinal()
+                                    .domain(allGroup)
+                                    .range(d3.schemeSet2);
+
+                                // Add X axis --> it is a date format
+                                const x = d3.scaleLinear()
+                                    .domain([1980, 2017])
+                                    .range([ 0, 2.8/5*width ]);
+                                svg.append("g")
+                                    .attr("transform", `translate(60, ${height})`)
+                                    .call(d3.axisBottom(x));
+
+                                // text label for the x axis
+                                svg.append("text")
+                                    .attr("transform",
+                                        "translate(" + width/2 + " ," +
+                                        (height + margin.top + 30) + ")")
+                                    .style("text-anchor", "middle")
+                                    .text("Year");
+
+                                // Add Y axis
+                                const y = d3.scaleLinear()
+                                    .domain([0, 700])
+                                    .range([ height, 0 ]);
+                                svg.append("g")
+                                    .attr('transform',`translate(60,0)`)
+                                    .call(d3.axisLeft(y));
+
+                                // text label for the y axis
+                                svg.append("text")
+                                    .attr("transform", "rotate(-90)")
+                                    .attr("y", 50 - margin.left)
+                                    .attr("x",0 - (height / 2))
+                                    .attr("dy", "0em")
+                                    .style("text-anchor", "middle")
+                                    .text("Sales in Millions");
+
+                                // Initialize line with group a
+                                const line = svg
+                                    .append('g')
+                                    .append("path")
+                                    .datum(data)
+                                    .attr('transform',`translate(60,${0} )`)
+                                    .attr("d", d3.line()
+                                        .x(function(d) { return x(+d.Year) })
+                                        .y(function(d) { return y(+d.Global_Sales) })
+                                    )
+                                    .attr("stroke", function(d){ return myColor("Global_Sales") })
+                                    .style("stroke-width", 3)
+                                    .style("fill", "none")
+
+                                // A function that update the chart
+                                function update(selectedGroup) {
+
+                                    // Create new data with the selection?
+                                    const dataFilter = data.map(
+                                        function(d) {
+                                            return { Year: parseInt(d.Year), sales: parseFloat(d[selectedGroup]) }
+                                        });
+
+                                    // Give these new data to update line
+                                    line
+                                        .datum(dataFilter)
+                                        .transition()
+                                        .duration(1000)
+                                        .attr("d", d3.line()
+                                            .x(function(d) { return x(+d.Year) })
+                                            .y(function(d) { return y(+d.sales) })
+                                        )
+                                        .attr("stroke", function(d){ return myColor(selectedGroup) })
+                                }
+
+                                // When the button is changed, run the updateChart function
+                                d3.select("#selectButton").on("change", function(event, d) {
+                                    // recover the option that has been chosen
+                                    const selectedOption = d3.select(this).property("value");
+                                    // run the updateChart function with this selected option
+                                    update(selectedOption)
+                                })
+                            })
+                        }
+
+                        render_sales_by_year();
+                    </script>
+            </div>
+			
+			<div class="col-md-6">
+                    <div class='tableauPlaceholder' id='viz1649096585350' style='position: relative'>
+                        <noscript>
+                            <a href='#'>
+                                <img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Vi&#47;VideoGamesDashboard_16490965382390&#47;Dashboard1&#47;1_rss.png' style='border: none' />
+                            </a>
+                        </noscript>
+                        <object class='tableauViz'  style='display:none;'>
+                            <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                            <param name='embed_code_version' value='3' />
+                            <param name='site_root' value='' />
+                            <param name='name' value='VideoGamesDashboard_16490965382390&#47;Dashboard1' />
+                            <param name='tabs' value='no' />
+                            <param name='toolbar' value='yes' />
+                            <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Vi&#47;VideoGamesDashboard_16490965382390&#47;Dashboard1&#47;1.png' />
+                            <param name='animate_transition' value='yes' />
+                            <param name='display_static_image' value='yes' />
+                            <param name='display_spinner' value='yes' />
+                            <param name='display_overlay' value='yes' />
+                            <param name='display_count' value='yes' />
+                            <param name='language' value='en-US' />
+                        </object>
+                    </div>
+
+                    <script type='text/javascript'>
+                        var divElement = document.getElementById('viz1649096585350');
+                        var vizElement = divElement.getElementsByTagName('object')[0];
+
+                        if ( divElement.offsetWidth > 800 ) { vizElement.style.width='1000px';vizElement.style.height='827px';
+                        } else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='1000px';vizElement.style.height='827px';
+                        } else { vizElement.style.width='100%';vizElement.style.height='727px';}
+
+                        var scriptElement = document.createElement('script');
+                        scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+                        vizElement.parentNode.insertBefore(scriptElement, vizElement);
+                    </script>
+            </div>
+        </div>
+		
+        <div class="row" style="margin-top: -10%; margin-right: 10%;">
+			<h4 style="font-family:Comic Sans MS;">Platforms</h4>
+			<div class="col-md-3">
+				<button onclick="location.href='https://store.steampowered.com/search/?filter=globaltopsellers&os=win';" class="button button1">
+					<img class="image" src="https://www.totalmayhemgames.com/wp-content/uploads/2020/09/PC-Game_-2020-Black.png" title="PC">
+				</button>
+			</div>
+
+			<div class="col-md-3">
+				<button onclick="location.href='https://www.nintendo.co.jp/ir/en/finance/software/index.html';" class="button button2">
+					<img class="image" src="https://www.pikpng.com/pngl/b/326-3264778_nintendo-switch-logo-png-clipart.png" title="Nintendo Switch">
+				</button>
+			</div>
+
+			<div class="col-md-3">
+				<button onclick="location.href='https://www.microsoft.com/en-us/store/top-paid/games/xbox';"  class="button button3">
+					<img class="image" src="https://raw.githubusercontent.com/Evehe719/INLS641/main/Xbox_logo.jpg" title = "Xbox">
+				</button>
+			</div>
+
+			<div class="col-md-3">
+				<button onclick="location.href='https://store.playstation.com/en-us/category/877e5ce2-4afc-4694-9f69-4758e34e58cd/1';" class="button button4">
+					<img class="image" src="https://pm1.narvii.com/6922/60b83948835967e031391fd6e97c85c4bc708a46r1-603-603v2_hq.jpg" title ="PlayStation"" title ="PlayStation">
+				</button>
+			</div>
+        </div>
+    </div>
+</body>
+</html>
