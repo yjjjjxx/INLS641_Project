@@ -1,5 +1,7 @@
 # 1983 to 2017 Video Game Sales Interactive Visualizations
 
+Members: Yuang Yang / Zihan He / Jiaxin Yang / Yuxin Ding
+
 #### **Our goal**
 
 The game industry has been booming in recent years. Video games are very popular among young people and player counts have hit 30 billion and will continue to grow. Our group members are fans of video games as well. Besides playing games, we found video games led to the development of other industries, such as the live streaming industry. Those factors may indicate that many people will be willing to invest and profit from the game market. For those potential investors and game lovers, we decided to build an interactive visualization system for them to access the latest information and 40-year sales trend of video games, and help stakeholders find potential market opportunities.  
